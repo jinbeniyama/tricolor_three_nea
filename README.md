@@ -65,6 +65,8 @@ python script/plot_ephem.py  --f_ephem data/2021TY14_2021-08-01to2022-06-01step1
 - Lightcurves and LS periodograms
 ``` 
 python script/plot_lc.py data/gri_mag.txt data/gri_2022GQ1_1s_N80.txt
+# Just check SNR
+python script/check_snr.py data/gri_mag.txt data/gri_2022GQ1_1s_N80.txt
 ```
 
 - Colors
