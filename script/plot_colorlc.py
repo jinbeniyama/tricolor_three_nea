@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from common import mymark, plot_jbstyle, rotation_nea
+from common import mycolor, mymark, plot_jbstyle, rotation_nea
 
 
 def calc_color_significance(mean_list, err_list, obj=None, color=None, verbose=True):
@@ -187,7 +187,122 @@ def calc_maximum_spot_size(C_main, C_spot, deltaC):
         )
         # f_spot_max = 1.0 # Optional: clip to 1.0 if necessary for further analysis
 
+
     return f_spot_max
+
+
+def analyze_and_plot_color(
+    ax, df, col_name, 
+    label, col_color, marker, 
+    c_a, c_b,
+    value_shift=0.0, offset=0.0, y_text=0.0, 
+    obj=None
+):
+    """
+    Process data for a single color, calculate binned stats, and plot.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Target axes.
+    df : pandas.DataFrame
+        Data source.
+    col_name : str
+        Column name of color index.
+    label : str
+        Label for plotting.
+    col_color : str
+        Color code/name for plotting.
+    marker : str
+        Marker style.
+    c_a : float
+        Intrinsic color of component A (main).
+    c_b : float
+        Intrinsic color of component B (spot).
+    value_shift : float
+        Shift value to add to the color index (e.g., -mean).
+    offset : float
+        Additional offset for display convenience.
+    y_text : float
+        Y-position for text annotation.
+    obj : str
+        Object name for logging.
+    """
+    col_val = col_name
+    col_err_name = f"{col_name}err" if f"{col_name}err" in df.columns else f"{col_name}_err"
+
+    if col_val not in df.columns:
+        return
+
+    # Plot Scatter + error bars
+    # Plot using df[col_val] + value_shift + offset
+    ax.errorbar(
+        df["phase"], df[col_val] + value_shift + offset,
+        yerr=df[col_err_name],
+        ms=5, color=col_color, marker=" ", capsize=0,
+        ls="None", label=None, zorder=1, lw=0.5
+    )
+    ax.scatter(
+        df["phase"], df[col_val] + value_shift + offset,
+        marker=marker, s=50, color=col_color,
+        facecolor="None", zorder=1, label=label, lw=0.5
+    )
+
+    # Binning
+    nbin = 10
+    width = 1. / nbin
+    mean_list = []
+    err_list  = []
+
+    for n in range(nbin):
+        p0, p1 = n * width, (n + 1) * width
+        pmean = (p0 + p1) / 2.
+        df_p = df[(df["phase"] >= p0) & (df["phase"] < p1)]
+
+        if len(df_p) == 0:
+            continue
+        
+        # Simple Mean and std err (for log)
+        mean   = np.mean(df_p[col_val])
+        std    = np.std(df_p[col_val])
+        stderr = std / np.sqrt(len(df_p))
+        print(f"  {col_name} {p0:.1f}–{p1:.1f}: mean={mean:.3f}, std={std:.3f}, stderr={stderr:.3f}")
+
+        # Weighted mean and its err (for plot/calculation)
+        vals = df_p[col_val].values
+        errs = df_p[col_err_name].values
+        weights = 1.0 / errs**2
+        mean_w = np.sum(weights * vals) / np.sum(weights)
+        stderr_w = np.sqrt(1.0 / np.sum(weights))
+        print(f"  {col_name} {p0:.1f}–{p1:.1f}: mean={mean_w:.3f}, err={stderr_w:.3f}")
+
+        mean_list.append(mean_w)
+        err_list.append(stderr_w)
+
+        # Plot weighted mean (shifted and offset)
+        ax.errorbar(
+            pmean, mean_w + value_shift + offset, stderr_w,
+            color=col_color, marker=marker, ms=10,
+            ls="None", label=None, zorder=2, lw=1.0, mec="black"
+        )
+
+        # Annotate with mean and stderr
+        #ax.text(
+        #    pmean, y_text,
+        #    f"${mean_w + value_shift + offset:.3f}\pm{stderr_w:.3f}$",
+        #    color="black", fontsize=14, ha="center", va="bottom", zorder=3
+        #)
+
+    # Significance calculation
+    if len(mean_list) >= 2:
+        dC, dCerr = calc_color_significance(mean_list, err_list, obj=obj, color=col_name)
+
+        # 1-sigma
+        dC_upper = dC + dCerr
+        f_spot_max = calc_maximum_spot_size(c_a, c_b, dC_upper)
+        print(f"  -> Maximum spot ratio: {f_spot_max:.2f}")
+
+
 
 
 if __name__ == "__main__":
@@ -215,7 +330,6 @@ if __name__ == "__main__":
     key_t = "t_jd_ltcor"
 
     # Colors and markers
-    mycolor = ["#69821b", "#AD002D", "#9400d3", "magenta"]
     cols = ["g_r", "r_i"]
     colormap = {"g_r": mycolor[0], "r_i": mycolor[1]}
     markmap = {"g_r": mymark[0], "r_i": mymark[1]}
@@ -227,8 +341,16 @@ if __name__ == "__main__":
 
     plot_jbstyle()
 
+    objtex = {
+        "2021UW1": "2021 $UW_1$",
+        "2021TY14": "2021 $TY_{14}$",
+        "2022GQ1": "2022 $GQ_1$",
+    }
+
+
     # For 2021UW1 and 2021TY14
     for obj in ["2021UW1", "2021TY14"]:
+        obj_tex = objtex[obj]
         print(f"\nProcessing {obj} ...")
         df = df_all[df_all["obj"] == obj].copy()
 
@@ -238,10 +360,10 @@ if __name__ == "__main__":
         df["phase"] = df[key_t] * 24. * 3600. / rotP_sec % 1
 
         # Setup figure
-        fig = plt.figure(figsize=(16, 5))
-        ax = fig.add_axes([0.08, 0.16, 0.88, 0.75])
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_axes([0.10, 0.16, 0.85, 0.75])
 
-        magmin, magmax = -0.2, 1.2
+        magmin, magmax = 0.0, 1.5
         y0, y1 = magmin, magmax
 
         for idx, c in enumerate(cols):
@@ -250,91 +372,44 @@ if __name__ == "__main__":
 
             if c == "g_r":
                 label = "g-r"
-                offset = 0
-                y_text = 0.90
+                offset = 1.0 # Center at 1.0
+                y_text = 1.25
+                # Typical colors for S-type vs C-type or Q-type? 
+                # Let's assume some defaults or pass specific ones if known
+                c_main_assumed = 0.68 # typical S-type g-r
+                c_spot_assumed = 0.43 # typical Q-type g-r
             else:
                 label = "r-i"
-                offset = 0
-                y_text = -0.15
+                offset = 0.5 # Shift down by 0.5 relative to g-r (center at 0.5)
+                y_text = 0.25
+                c_main_assumed = 0.20 # typical S-type r-i
+                c_spot_assumed = 0.10 # typical Q-type r-i
 
             col_val = c
-            col_err = f"{c}err" if f"{c}err" in df.columns else f"{c}_err"
             if col_val not in df.columns:
                 continue
 
-            # Scatter + error bars
-            ax.errorbar(
-                df["phase"], df[col_val] + offset,
-                yerr=df[col_err],
-                ms=5, color=col, marker=" ", capsize=0,
-                ls="None", label=None, zorder=1, lw=0.7)
-            ax.scatter(
-                df["phase"], df[col_val] + offset,
-                marker=mark, s=50, color=col,
-                facecolor="None", zorder=1, label=label, lw=0.7)
+            # Calculate shift to center data properties around 0 before adding offset
+            # For 2021UW1/2021TY14 which are absolute colors, 
+            # if we want "relative variation centered at X", maybe we subtract mean and add offset?
+            # The prompt says "center is 1".
+            # If we want to see variation, usually we do (val - mean) + 1.0.
+            gmean = np.mean(df[col_val])
 
-            nbin = 10
-            width = 1. / nbin
-            # To calculate difference
-            mean_list = []
-            err_list  = []
-            for n in range(nbin):
-                p0, p1 = n * width, (n + 1) * width
-                pmean = (p0 + p1) / 2.
-                df_p = df[(df["phase"] >= p0) & (df["phase"] < p1)]
-
-                if len(df_p) == 0:
-                    continue
-                
-                # Mean and std err
-                mean   = np.mean(df_p[col_val])
-                std    = np.std(df_p[col_val])
-                stderr = std/np.sqrt(len(df_p))
-                print(f"  {c} {p0:.1f}–{p1:.1f}: mean={mean:.3f}, std={std:.3f}, stderr={stderr:.3f}")
-
-
-                # Weighted mean and its err
-                vals = df_p[col_val].values
-                errs = df_p[col_err].values
-                weights = 1.0 / errs**2
-                mean = np.sum(weights * vals) / np.sum(weights)
-                stderr = np.sqrt(1.0 / np.sum(weights))
-                print(f"  {c} {p0:.1f}–{p1:.1f}: mean={mean:.3f}, err={stderr:.3f}")
-
-                mean_list.append(mean)
-                err_list.append(stderr)
-
-                ax.errorbar(
-                    pmean, mean + offset, stderr,
-                    color="orange", marker="o", ms=10,
-                    ls="None", label=None, zorder=2, lw=0.7, mec="black")
-
-                # mean and stderr
-                ax.text(
-                    pmean, y_text,
-                    f"${mean:.3f}\pm{stderr:.3f}$",
-                    color="black", fontsize=14, ha="center", va="bottom", zorder=3
-                )
-            # --- significance calculation ---
-            if len(mean_list) >= 2:
-                dC, dCerr = calc_color_significance(mean_list, err_list, obj=obj, color=c)
-                #chi2_constant_test(
-                #    df[col_val].values, df[col_err].values, obj=obj, color=c)
-
-                # Typical g-r for S and C
-                c_a = 0.40
-                c_b = 0.60
-                # 1-sigma
-                dC = dC + dCerr
-                f_spot_max = calc_maximum_spot_size(c_a, c_b, dC)
-                print(f"  -> Maximum spot ratio: {f_spot_max:.2f}")
+            analyze_and_plot_color(
+                ax, df, c, 
+                label, col, mark, 
+                c_a=c_main_assumed, c_b=c_spot_assumed,
+                value_shift=-gmean, offset=offset, y_text=y_text, 
+                obj=obj
+            )
 
         ax.set_xlabel(f"Rotation phase (P={rotP_sec} s, JD0={JD0})")
         ax.set_ylabel("Color index")
-        ax.legend(ncol=2, loc="upper left")
+        #ax.legend(ncol=2, loc="upper left")
         ax.set_xlim([0, 1])
         ax.set_ylim([y0, y1])
-        ax.set_title(obj)
+        ax.set_title(obj_tex)
 
         # Save per target
         out = os.path.join(outdir, f"{obj}_colorlc.{args.outtype}")
@@ -347,6 +422,7 @@ if __name__ == "__main__":
     # For 2022 GQ1
     for obj in sorted(["2022GQ1"]):
         print(f"\nProcessing {obj} ...")
+        obj_tex = objtex[obj]
 
         df = pd.read_csv(args.res_GQ1, sep=" ")
 
@@ -360,13 +436,12 @@ if __name__ == "__main__":
         df["phase"] = df[key_t] * 24. * 3600. / rotP_sec % 1
 
         # Setup figure
-        fig = plt.figure(figsize=(16, 5))
-        ax = fig.add_axes([0.08, 0.16, 0.88, 0.75])
-
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_axes([0.10, 0.16, 0.85, 0.75])
  
         # Use mag. This is not ideal when S/N is low. ========================= 
         # The noise distribution is not  gaussian.
-        magmin, magmax = -0.2, 1.2
+        magmin, magmax = 0.0, 1.5
         y0, y1 = magmin, magmax
 
         for idx, c in enumerate(cols):
@@ -375,92 +450,39 @@ if __name__ == "__main__":
 
             if c == "g_r":
                 label = "g-r"
-                offset = 0.8
-                y_text = 0.90
+                offset = 1.0
+                y_text = 1.25
+                c_main_assumed = 0.40 # Q-type g-r? just example
+                c_spot_assumed = 0.60
             else:
                 label = "r-i"
-                offset = 0.2
-                y_text = -0.15
+                offset = 0.5
+                y_text = 0.25
+                c_main_assumed = 0.05
+                c_spot_assumed = 0.15
+
 
             col_val = c
-            col_err = f"{c}err" if f"{c}err" in df.columns else f"{c}_err"
-
             if col_val not in df.columns:
                 continue
             
             # Global mean
             gmean = np.mean(df[col_val])
 
-            # Scatter + error bars
-            ax.errorbar(
-                df["phase"], df[col_val] - gmean + offset,
-                yerr=df[col_err],
-                ms=5, color=col, marker=" ", capsize=0,
-                ls="None", label=None, zorder=1, lw=0.7)
-            ax.scatter(
-                df["phase"], df[col_val] - gmean + offset,
-                marker=mark, s=50, color=col,
-                facecolor="None", zorder=1, label=label, lw=0.7)
-
-            nbin = 10
-            width = 1. / nbin
-            mean_list, err_list = [], []
-            for n in range(nbin):
-                p0, p1 = n * width, (n + 1) * width
-                pmean = (p0 + p1) / 2.
-                df_p = df[(df["phase"] >= p0) & (df["phase"] < p1)]
-
-                if len(df_p) == 0:
-                    continue
-
-                mean   = np.mean(df_p[col_val])
-                std    = np.std(df_p[col_val])
-                stderr = std/np.sqrt(len(df_p))
-                print(f"  {c} {p0:.1f}–{p1:.1f}: mean={mean:.3f}, std={std:.3f}, stderr={stderr:.3f}")
-
-                # Weighted mean and its err
-                vals = df_p[col_val].values
-                errs = df_p[col_err].values
-                weights = 1.0 / errs**2
-                mean = np.sum(weights * vals) / np.sum(weights)
-                stderr = np.sqrt(1.0 / np.sum(weights))
-                print(f"  {c} {p0:.1f}–{p1:.1f}: mean={mean:.3f}, err={stderr:.3f}")
-
-                mean_list.append(mean)
-                err_list.append(stderr)
-
-                ax.errorbar(
-                    pmean, mean - gmean + offset, stderr,
-                    color="orange", marker="o", ms=10,
-                    ls="None", label=None, zorder=2, lw=0.7, mec="black")
-
-                # mean and stderr
-                ax.text(
-                    pmean, y_text,
-                    f"${mean-gmean+offset:.3f}\pm{stderr:.3f}$",
-                    color="black", fontsize=14, ha="center", va="bottom", zorder=3
-                )
-
-            # --- significance calculation ---
-            if len(mean_list) >= 2:
-                dC, dCerr = calc_color_significance(mean_list, err_list, obj=obj, color=c)
-                #chi2_constant_test(
-                #    df[col_val].values, df[col_err].values, obj=obj, color=c)
-
-                # Typical g-r for S and C
-                c_a = 0.40
-                c_b = 0.60
-                # 1-sigma
-                dC = dC + dCerr
-                f_spot_max = area_patch_max = calc_maximum_spot_size(c_a, c_b, dC)
-                print(f"  -> Maximum spot ratio: {f_spot_max:.2f}")
+            analyze_and_plot_color(
+                ax, df, c, 
+                label, col, mark, 
+                c_a=c_main_assumed, c_b=c_spot_assumed,
+                value_shift=-gmean, offset=offset, y_text=y_text, 
+                obj=obj
+            )
 
         ax.set_xlabel(f"Rotation phase (P={rotP_sec} s, JD0={JD0})")
         ax.set_ylabel("Color index")
-        ax.legend(ncol=2, loc="upper left")
+        #ax.legend(ncol=2, loc="upper left")
         ax.set_xlim([0, 1])
         ax.set_ylim([y0, y1])
-        ax.set_title(obj)
+        ax.set_title(obj_tex)
         # Use mag. This is not ideal when S/N is low. ========================= 
 
 
