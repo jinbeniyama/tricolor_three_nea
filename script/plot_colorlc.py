@@ -61,8 +61,8 @@ def calc_color_significance(mean_list, err_list, obj=None, color=None, verbose=T
         if color is not None:
             tag += f"{color} "
 
-        print(f"\n  >>> {tag}color variation:")
-        print(f"      ΔC = {dC:.3f} ± {err:.3f} (mag)")
+        print(f"  {tag}color variation:")
+        print(f"  ΔC = {dC:.3f} ± {err:.3f} (mag)")
 
     return dC, err
 
@@ -116,7 +116,7 @@ def chi2_constant_test(vals, errs, obj=None, color=None, verbose=True):
         if color:
             tag += f"{color} "
 
-        print(f"\n  >>> {tag}constant-color test:")
+        print(f"    >>> {tag}constant-color test:")
         print(f"      chi2 = {chi2:.2f}")
         print(f"      dof = {dof}")
         print(f"      reduced chi2 = {redchi2:.2f}")
@@ -266,7 +266,7 @@ def analyze_and_plot_color(
         mean   = np.mean(df_p[col_val])
         std    = np.std(df_p[col_val])
         stderr = std / np.sqrt(len(df_p))
-        print(f"  {col_name} {p0:.1f}–{p1:.1f}: mean={mean:.3f}, std={std:.3f}, stderr={stderr:.3f}")
+        #print(f"  {col_name} {p0:.1f}–{p1:.1f}: mean={mean:.3f}, std={std:.3f}, stderr={stderr:.3f}")
 
         # Weighted mean and its err (for plot/calculation)
         vals = df_p[col_val].values
@@ -274,7 +274,7 @@ def analyze_and_plot_color(
         weights = 1.0 / errs**2
         mean_w = np.sum(weights * vals) / np.sum(weights)
         stderr_w = np.sqrt(1.0 / np.sum(weights))
-        print(f"  {col_name} {p0:.1f}–{p1:.1f}: mean={mean_w:.3f}, err={stderr_w:.3f}")
+        #print(f"  {col_name} {p0:.1f}–{p1:.1f}: mean={mean_w:.3f}, err={stderr_w:.3f}")
 
         mean_list.append(mean_w)
         err_list.append(stderr_w)
@@ -374,16 +374,16 @@ if __name__ == "__main__":
                 label = "g-r"
                 offset = 1.0 # Center at 1.0
                 y_text = 1.25
-                # Typical colors for S-type vs C-type or Q-type? 
-                # Let's assume some defaults or pass specific ones if known
-                c_main_assumed = 0.68 # typical S-type g-r
-                c_spot_assumed = 0.43 # typical Q-type g-r
+                # This corresponds to notable case
+                c_main_assumed = 0.40 
+                c_spot_assumed = 0.60
             else:
                 label = "r-i"
                 offset = 0.5 # Shift down by 0.5 relative to g-r (center at 0.5)
                 y_text = 0.25
-                c_main_assumed = 0.20 # typical S-type r-i
-                c_spot_assumed = 0.10 # typical Q-type r-i
+                # This corresponds to notable case
+                c_main_assumed = 0.40 
+                c_spot_assumed = 0.60
 
             col_val = c
             if col_val not in df.columns:
@@ -415,8 +415,6 @@ if __name__ == "__main__":
         out = os.path.join(outdir, f"{obj}_colorlc.{args.outtype}")
         fig.savefig(out)
         plt.close()
-        print(f"  -> Saved: {out}")
-
 
 
     # For 2022 GQ1
@@ -452,14 +450,16 @@ if __name__ == "__main__":
                 label = "g-r"
                 offset = 1.0
                 y_text = 1.25
-                c_main_assumed = 0.40 # Q-type g-r? just example
+                # This corresponds to notable case
+                c_main_assumed = 0.40 
                 c_spot_assumed = 0.60
             else:
                 label = "r-i"
                 offset = 0.5
                 y_text = 0.25
-                c_main_assumed = 0.05
-                c_spot_assumed = 0.15
+                # This corresponds to notable case
+                c_main_assumed = 0.40 
+                c_spot_assumed = 0.60
 
 
             col_val = c
@@ -586,4 +586,3 @@ if __name__ == "__main__":
         out = os.path.join(outdir, f"{obj}_colorlc.{args.outtype}")
         fig.savefig(out)
         plt.close()
-        print(f"  -> Saved: {out}")
