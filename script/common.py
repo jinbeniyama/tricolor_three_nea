@@ -399,7 +399,6 @@ def plot_jbstyle():
     mpl.rcParams.update({
         "figure.figsize": (7.2, 4.8),
         "figure.dpi": 300,
-        "figure.autolayout": True
     })
 
     # ---------- Axes ----------
