@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from common import mycolor, mymark, plot_jbstyle, rotation_nea
+from common import JD0_dict, mycolor, mymark, plot_jbstyle, rotation_nea
 
 
 def calc_color_significance(mean_list, err_list, obj=None, color=None, verbose=True):
@@ -336,8 +336,6 @@ if __name__ == "__main__":
 
     # Read data
     df_all = pd.read_csv(args.res, sep=" ")
-    JD0 = 2459503.1
-    df_all[key_t] -= JD0
 
     plot_jbstyle()
 
@@ -353,6 +351,10 @@ if __name__ == "__main__":
         obj_tex = objtex[obj]
         print(f"\nProcessing {obj} ...")
         df = df_all[df_all["obj"] == obj].copy()
+
+        # Subtract time zero
+        JD0 = JD0_dict[obj]
+        df[key_t] -= JD0
 
         rotP_sec, _, _, _ = rotation_nea(obj)
 
@@ -394,17 +396,17 @@ if __name__ == "__main__":
             # if we want "relative variation centered at X", maybe we subtract mean and add offset?
             # The prompt says "center is 1".
             # If we want to see variation, usually we do (val - mean) + 1.0.
-            gmean = np.mean(df[col_val])
+            gmedian = np.median(df[col_val])
 
             analyze_and_plot_color(
                 ax, df, c, 
                 label, col, mark, 
                 c_a=c_main_assumed, c_b=c_spot_assumed,
-                value_shift=-gmean, offset=offset, y_text=y_text, 
+                value_shift=-gmedian, offset=offset, y_text=y_text, 
                 obj=obj
             )
 
-        ax.set_xlabel(f"Rotation phase (P={rotP_sec} s, JD0={JD0})")
+        ax.set_xlabel(f"Rotation phase (P={rotP_sec} s, JD$_0$={JD0})")
         ax.set_ylabel("Color index")
         #ax.legend(ncol=2, loc="upper left")
         ax.set_xlim([0, 1])
@@ -427,6 +429,10 @@ if __name__ == "__main__":
         rad_GQ1 = 10
         rad_GQ1 = 10
         df = df[df["radius"] == rad_GQ1]
+
+        # Subtract time zero
+        JD0 = JD0_dict[obj]
+        df[key_t] -= JD0
 
         rotP_sec, _, _, _ = rotation_nea(obj)
 
@@ -467,17 +473,17 @@ if __name__ == "__main__":
                 continue
             
             # Global mean
-            gmean = np.mean(df[col_val])
+            gmedian = np.median(df[col_val])
 
             analyze_and_plot_color(
                 ax, df, c, 
                 label, col, mark, 
                 c_a=c_main_assumed, c_b=c_spot_assumed,
-                value_shift=-gmean, offset=offset, y_text=y_text, 
+                value_shift=-gmedian, offset=offset, y_text=y_text, 
                 obj=obj
             )
 
-        ax.set_xlabel(f"Rotation phase (P={rotP_sec} s, JD0={JD0})")
+        ax.set_xlabel(f"Rotation phase (P={rotP_sec} s, JD$_0$={JD0})")
         ax.set_ylabel("Color index")
         #ax.legend(ncol=2, loc="upper left")
         ax.set_xlim([0, 1])
