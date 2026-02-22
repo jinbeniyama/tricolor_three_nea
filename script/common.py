@@ -23,6 +23,16 @@ loc_Seimei = {
     "elevation" :   0.355
     }
 
+# JD0
+JD0_dict = {
+    # 2021-10-15 12:00:00
+    "2021TY14": 2459503.0,    
+    # 2021-10-29 12:00:00
+    "2021UW1": 2459517.0, 
+    # 2022-04-07 12:00:00
+    "2022GQ1": 2459677.0,     
+    }
+
 # TODO: Check before submission 
 def rotation_nea(obj):
     """Return rotation parameters.
@@ -795,13 +805,14 @@ def plot_plc(
         ymargin=0.5,
         objtex=None,
         ylim=None,
+        JD0=2451544.5,
     ):
     """
     Phase-folded light curve only.
     """
 
-    # ---- time in seconds from zero ----
-    t = (df[key_t] - df[key_t].min()) * 24. * 3600.
+    # ---- time in seconds from JD0 ----
+    t = (df[key_t] - JD0) * 24. * 3600.
     phase = (t / rotP_sec) % 1
 
     fig = plt.figure(figsize=(6, 6))
@@ -878,7 +889,7 @@ def plot_plc(
 
     # ---- labels ----
     ylabel = "Relative magnitude" if relative else "Observed magnitude"
-    ax.set_xlabel("Rotation phase")
+    ax.set_xlabel(f"Rotation phase (JD$_0$={JD0})")
     ax.set_ylabel(ylabel)
 
     # Put period
@@ -895,7 +906,6 @@ def plot_plc(
     # ---- limits ----
     ax.set_xlim(-0.35, 1.35)
     ax.set_xticks(np.arange(-0.2, 1.21, 0.2))
-    ax.set_xlabel("Rotation phase")
 
 
     if ylim is not None:
