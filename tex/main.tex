@@ -1,0 +1,848 @@
+%%%  =============================================================
+%%%   SOURCE FILE of Paper on Simultaneous Tricolor Video Observations of 
+%%%   Three Tiny Near-Earth Asteroids with Sub-Minute Rotation Periods
+%%%     Led by Jin Beniyama: jbeniyama@oca.eu,
+%%%                              https://jinbeniyama.github.io/website/index.html
+%%%  =============================================================
+%%%  ------------------
+%%%   Material
+%%%  ------------------
+%%%  main.tex                (this main file)
+%%%  Figures (N=x)
+%%%    test.png              (test)
+%%%  Tables (N=2)
+%%%    tab_phot.tex          (summary of observations)
+%%%    tab_res.tex           (summary of results)
+%%%  Miscellaneous
+%%%    bib_JB.bib
+%%%    aa.bst                (from aa template)
+%%%    aa.cls                (from aa template)
+%%%    linenoaa.sty          (from aa template)
+%%%
+%%%  ------------------
+%%%   History
+%%%  ------------------
+%%%  2024-12-16 J.B. started writing
+%%%  2026-02-12 Discussion changed
+%%%  2026-mm-dd First draft was submitted to A&A
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{aa}  
+\usepackage{graphicx}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{txfonts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{longtable}
+% Original commands ===========================================================
+% For spacing with newcommand 
+\usepackage{xspace}
+% Original colors
+\usepackage{xcolor}
+\definecolor{myred}{rgb}{0.67571825, 0, 0.17578125}
+\definecolor{myblue}{rgb}{0, 0.203125, 0.3828125}
+% Change color of the link.
+\usepackage{hyperref}
+% Activate
+\hypersetup{
+    colorlinks=true,
+    linkcolor=myblue,
+    urlcolor=myblue,
+    citecolor=myblue,
+    filecolor=myblue
+}
+% For textcolor
+\usepackage{color}
+% Textcolor "red"
+\newcommand{\RED}[1]{\textcolor{red}{#1}}
+% Object names
+\newcommand\TY{2021~TY$_{14}$\xspace}
+\newcommand\UW{2021~UW$_{1}$\xspace}
+\newcommand\GQ{2022~GQ$_{1}$\xspace}
+% Method related
+% 15 pix ~ 5.25 arcsec
+% FWHM TY, 3.2 arcsec. -> 1.64 FWHM
+% FWHM UW, 3.5 arcsec  -> 1.5 FWHM
+\newcommand\radTY{15\xspace}
+\newcommand\radUW{15\xspace}
+\newcommand\radGQ{10\xspace}
+% Results
+\newcommand\Nmc{1000\xspace}
+\newcommand\Nboot{1000\xspace}
+\newcommand\rotPofTY{$15.282\pm0.001$~s\xspace}
+\newcommand\rotPofUW{$21.099\pm0.003$~s\xspace}
+\newcommand\rotPofGQ{$8.778\pm0.012$~s\xspace}
+\newcommand\dmTY{$0.768\pm0.012$\xspace}
+\newcommand\abminTY{1.51\xspace}
+\newcommand\dmUW{$0.242\pm0.013$\xspace}
+\newcommand\abminUW{1.14\xspace}
+\newcommand\dmGQ{$0.815\pm0.035$\xspace}
+\newcommand\abminGQ{1.24\xspace}
+\newcommand\grTY{$g-r = 0.448\pm0.003$\xspace}
+\newcommand\riTY{$r-i = 0.189\pm0.002$\xspace}
+\newcommand\grUW{$g-r = 0.571\pm0.005$\xspace}
+\newcommand\riUW{$r-i = 0.240\pm0.002$\xspace}
+\newcommand\grGQ{$g-r = 0.562\pm0.041$\xspace}
+\newcommand\riGQ{$r-i = 0.179\pm0.033$\xspace}
+\newcommand\dCgrTY{$0.064\pm0.017$\xspace}
+\newcommand\dCriTY{$0.030\pm0.010$\xspace}
+\newcommand\dCgrUW{$0.040\pm0.023$\xspace}
+\newcommand\dCriUW{$0.025\pm0.010$\xspace}
+\newcommand\dCgrGQ{$0.418\pm0.123$\xspace}
+\newcommand\dCriGQ{$0.275\pm0.075$\xspace}
+% Maximum spot size
+\newcommand\fspotmaxTY{0.20\xspace}
+\newcommand\fspotmaxUW{0.17\xspace}
+% Original commands ===========================================================
+
+
+
+% Author contributions (by J.B.) ================================================
+%   Jin Beniyama       : led the project
+% Author contributions (by J.B.) ================================================
+
+
+\begin{document} 
+%\title{
+%   Simultaneous Multicolor Video Observations of Ultra-Fast Rotating Asteroids
+%}
+% ApJL: Takacs2025, Three Fast-spinning Medium-sized Hilda Asteroids Uncovered by TESS
+% ApJL: Chang2022b, The Large Superfast Rotators Discovered by the Zwicky Transient Facility
+% 
+\title{
+   Simultaneous Tricolor Video Observations of Three Tiny Near-Earth Asteroids with Sub-Minute Rotation Periods
+}
+\author{
+    Jin Beniyama\inst{1,2},
+    Ryou Ohsawa\inst{3}, XXX
+    %Daisuke Kuroda,
+    %Tomohiko Sekiguchi,
+    %Shigeyuki Sako,
+    %Takita Satoshi,
+    %Keisuke Isogai,
+    % Daisuke Kuroda (2021 UW1)
+    % Tomohiko Sekiguchi (2021 UW1)
+    % Shigeyuki Sako (OISTER)
+    % Ryou Ohsawa    (OISTER)
+    % Takita Satoshi (OISTER)
+    % Keisuke Isogai (2021 TY14, 2022 GQ1)
+    % Other members in the proposal? (D+ member)
+    %\and
+}
+\institute{
+    % 1
+    Université Côte d'Azur, 
+    Observatoire de la Côte d'Azur, CNRS, Laboratoire Lagrange, Bd de l'Observatoire, 
+    CS 34229, 06304 Nice Cedex 4, France \\
+    \email{jbeniyama@oca.eu}
+    \and
+    % 2
+    Department of Earth and Planetary Science, The University of Tokyo, 7-3-1 Hongo, Bunkyo, Tokyo 113-0033, Japan
+    \and
+    % 3
+    National Astronomical Observatory of Japan, 2-21-1 Osawa, Mitaka, Tokyo 181-8588, Japan
+    % 4
+    %Institute of Astronomy, Graduate School of Science, The University of Tokyo, 2-21-1 Osawa, %Mitaka, Tokyo 181-0015, Japan
+    %\and
+}
+\date{Received mm dd, 2026}
+
+% \abstract{}{}{}{}{} 
+% 5 {} token are mandatory
+\abstract
+% context heading (optional)
+{
+Studying the physical properties of near-Earth asteroids (NEAs) is crucial for understanding their dynamical histories and origins, and for assessing potential impact hazards to Earth.
+}
+% aims heading (mandatory)
+{
+We aim to characterize the rotation periods and visible colors of three tiny NEAs with diameters smaller than 100~m.
+}
+% methods heading (mandatory)
+{
+We performed simultaneous $g$-, $r$-, and $i$-band photometry of three tiny NEAs using the TriColor CMOS Camera and Spectrograph (TriCCS) on the 3.8~m Seimei Telescope.
+We used high-cadence video observations with exposure times of 1~s and 5~s to investigate possible lightcurve variations on timescales of a few seconds.
+}
+% results heading (mandatory)
+{
+All three NEAs are confirmed as fast rotators with rotation periods shorter than 60~s: \rotPofTY for \TY, \rotPofUW for \UW, and \rotPofGQ for \GQ.
+%the fastest rotator ever spectroscopically characterized.
+The derived $g-r$ and $r-i$ colors indicate that \TY belongs to the X-complex, while \UW\ and \GQ\ belong to the S-complex.
+Their positions in the diameter–rotation period (D–P) diagram show that all three objects belong to the small, 
+fast-rotating NEA population, 
+with \GQ being the smallest and fastest-rotating among them with spectroscopic measurements.
+Analysis of their multicolor lightcurves suggests that their surfaces are largely homogeneous, although minor localized variations of up to $\sim20$\% in composition cannot be ruled out.
+}
+% conclusions heading (optional), leave it empty if necessary
+{
+High-cadence, multicolor photometry with small to medium telescopes proves effective for determining both rotation periods and spectral types of tiny NEAs, 
+providing insight into their rotation states, surface colors, and their homogeneity.
+}
+% See https://www.aanda.org/author-information/information-files/170-aaa-keywords
+\keywords{
+Minor planets, asteroids: general --
+Minor planets, asteroids: individual: \TY, \UW, \GQ --
+Techniques: photometric
+}
+\titlerunning{Tricolor Video Observations}
+\authorrunning{Beniyama, J., et al.}
+\maketitle
+
+% Possible references
+%\citet{Novakovic2025} performed dense photometry of FRA candidates.
+%\citet{Marveta2025} studies the Yarkovsky effect in tiny, fast rotators.
+% Fenucci2022 etc.
+%  Indivisual NEAs such as 
+% Carbognani+2017, Physical characterization of NEA Large Super-Fast Rotator (436724) 2011 UW158⋆
+% Urakawa+2014, AJ, Fast Rotation of a Subkilometer-sized Near-Earth Object 2011 XA3
+% Rondon
+% Hora+2018, ApJS, infrared lightcurves incl. one fast rotating NEAs
+% Not UFRAs
+%Even Earth-impacting asteroids were characterized and known to be FRAs, 2022 WJ$_1$ by \citet{Kareta2023}
+
+\section{Introduction}
+% 1. Importance of studying rotations, especially rotation states
+Studying near-Earth asteroids (NEAs) is crucial for understanding their dynamical histories and origins, as well as for planetary defense efforts to mitigate potential asteroid impacts on Earth.
+One of the fundamental physical quantities of asteroids is their rotation period.
+In the gravity-dominated regime, where self-gravity exceeds material strength, 
+asteroids with rotation periods shorter than about 2~hr, the so-called cohesionless spin barrier, 
+are thought to undergo structural failure or disruption \citep{Pravec2000b}.
+Therefore, the rotation period provides important constraints on an asteroid’s internal structure.
+
+% 2. Previous studies on the cohesionless spin barrier
+%   Chang2014b, ApJL, 1 MBA, 2005 UW163, A NEW LARGE SUPER-FAST ROTATOR: (335433) 2005 UW163
+%   Chang2016, PTF, MBAs
+%   Chang2016, PTF, 1 MBA confirmation
+%   Chang2019, PS1, many MBAs
+%   Yeh2020, China Near-Earth Object Survey Telescope (CNEOST), MBAs, Hildas, JTs,
+%   Chang2022b, ZTF, MBAs
+%   Greenstreet2026, LSST, MBAs + 1 NEA
+Many authors have investigated the cohesionless spin barrier in various asteroid populations,
+including main-belt asteroids 
+\citep{Chang2014b, Chang2016, Chang2017, Chang2019, Yeh2020, Chang2022b}, Jovian Trojans \citep{Chang2021, Kiss2025}, and Hildas \citep{Chang2022a, Takacs2025}.
+Recently, \citet{Greenstreet2026} derived reliable rotation periods of 75 main-belt asteroids and one NEA observed in the first LSST Camera commissioning images from the Vera C. Rubin Observatory.
+The spin barriers, or equivalently the shortest rotation periods, differ among these population and likely reflect differences in composition.
+Importantly, \citet{Carbognani2017} investigated the spectral types of fast-rotating asteroids with rotation periods close to the cohesionless spin barrier.
+They showed that the observationally deterined 
+critical rotation periods of S- and C-type asteroids in the 4--20~km size range differ by a factor of about 1.20.
+This provides evidence for the existence of the cohesionless spin barrier, which can be explained by differences in bulk density between spectral types.
+
+% Move on NEAs, UFRAs
+% Thirouin2016: 2014 RC (15.8 s, Sq-type Devogele2019), 2015 SV6 (18 s, no spec.), no lightcurves were shown
+% Thirouin2018: 2016 MA (18.4 s), 2017 QG18 (11.9 s, Q-type Devogele2019) 
+% Shanchez2024: Combine IRTF spec & guide camera photometry
+%               Minimum perios (in the paper) is 101.88 s.
+In recent years, an increasing number of rotation periods shorter 
+than the cohesionless spin barrier have been reported for small NEAs, 
+as well as for some MBAs, observed either through dedicated campaigns or serendipitously.
+%In this paper, we define fast-rotating asteroids (FRAs) as those with rotation periods shorter than 2~hr, corresponding to the upper limit of the cohesionless spin barrier,
+%and ultra-fast-rotating asteroids (UFRAs) as those with rotation periods shorter than 60~s.
+% Thirouin2016,2018 use ultra rapid rotators
+% Thirouin2018, Ultra rapid rotators, P < 20 s
+% Statistical studies of NEAs 1
+The Mission Accessible Near-Earth Objects Survey (MANOS) has carried out dedicated lightcurve observations, spectroscopy, and spectrophotometry of small NEAs \citep{Thirouin2016, Thirouin2018, Devogele2019}.
+The survey assembled lightcurves for 228 small NEAs using 1--4~m class telescopes \citep{Thirouin2016, Thirouin2018}.
+The  sample includes four sub-minute rotators: 2014~RC with a rotation period of 15.8~s, 2015~SV$_6$ with 18~s, 2016~MA with 18.4~s, and 2017~QG$_{18}$ with 11.9~s.
+Another statistical study of the physical properties of NEAs is a spectroscopic survey conducted with the NASA Infrared Telescope Facility \citep[IRTF,][]{Sanchez2024}.
+That study combined spectroscopic data for 84 small NEAs obtained between 2017 and 2021.
+Photometric data for 59 NEAs, obtained with a guide camera on the IRTF, were also analyzed.
+Subsecond photometry, or video observations, of tiny NEAs with diameters below 100~m were conducted using the 1.05~m telescope at Kiso Observatory in Japan \citep{Beniyama2022}.
+Rotation periods were derived for 32 NEAs, including 13 sub-minute rotators.
+
+% Statistical studies of NEAs 2  
+A target-of-opportunity streak photometry was conducted with 
+the Canada--France--Hawaii Telescope (CFHT) on Mauna Kea, Hawaii \citep{Bolin2024}.
+This study reported three sub-minute rotators from long-exposure photometry: 
+2016~GE$_1$ with a rotation period of 31~s, 
+2016~CG$_{18}$ with 55~s, 
+and 2016~EV$_{84}$ with 52~s.
+Two additional sub-minute rotators were identified using aperture photometry on asteroid trails \citep{Devogele2024b},
+with possible rotation periods of 9.16~s and 18.33~s reported for 2023~CX$_1$ ($D\sim1$~m).
+The fastest rotation period ever reported, $2.5888\pm0.0002$~s, was found for 2024~BX$_1$ \citep[$D\sim1$~m,][]{Devogele2024b}.
+The Great Shefford Observatory (MPC code J95) also regularly reports fast-rotating asteroids including sub-minute rotators 
+\citep{Birtwhistle2009, Birtwhistle2011a, Birtwhistle2011b, Birtwhistle2018a, Birtwhistle2018b, Birtwhistle2021a, Birtwhistle2021b, Birtwhistle2021c, Birtwhistle2021d, Birtwhistle2021e, Birtwhistle2022a, Birtwhistle2022b, Birtwhistle2022c, Birtwhistle2023a, Birtwhistle2023b, Birtwhistle2023c, Birtwhistle2023d, Birtwhistle2024a, Birtwhistle2024b, Birtwhistle2024c, Birtwhistle2024d, Birtwhistle2025a, Birtwhistle2025b, Birtwhistle2025c}.
+
+% 4. Motivation and outline of this paper
+Spin barriers, if present, can be identified in diameter–rotation period diagrams even for objects rotating faster than the cohesionless spin barrier.
+Although many lightcurves of fast-rotating asteroids have been obtained, relatively few spectroscopic or spectrophotometric observations have been reported.
+This might primarily be due to their faintness, the limited observing windows during close approaches, and the restricted availability of medium- to large-aperture telescopes.
+\citet{Polishook2012} performed both spectroscopic and lightcurve observations of two tiny NEAs, 2012~KP$_{24}$ ($D\sim20$~m) and 2012~KT$_{42}$ ($D\sim6$~m), 
+as part of a rapid-response program at NASA's IRTF.
+They derived rotation periods of approximately 2.5~min for 2012~KP$_{24}$ and 3.6~min for 2012~KT$_{42}$.
+More recently, two fast-rotators were characterized within the framework of the Visible Near-Earth Objects Survey \citep[ViNOS;][]{Licandro2023}.
+That study reported rotation periods of about 13~min for 2021~NY$_1$ ($D\sim100$~m) and about 3~min for 2022~AB ($D\sim65$~m assuming a geometric albedo of 0.15).
+The spectral-type distribution of fast-rotating asteroids remains only partially understood, and that of sub-minute rotators is even less well constrained.
+We aim to demonstrate that high-cadence, simultaneous tricolor photometry can determine both rotation periods and visible colors of tiny fast-ratoting NEAs.
+
+% Outline
+In this paper, we report the results of visible simultaneous multicolor photometry of three tiny NEAs.
+The paper is organized as follows.
+Section~2 describes our photometric observations and data reduction.
+The observational results, along with constraints on the physical properties of the three NEAs and their implications, are presented in Section~3.
+
+
+\section{Observations and data reduction}
+% 1. Observations
+% 2. Data reduction
+\subsection{Tricolor video observations}
+% TY: 21B-K-0036 OISTER
+% GQ: 22A-K-0024 OISTER
+We conducted simultaneous multicolor photometric observations of three NEAs: 
+\UW\ on October~15, 2021, \TY\ on October~29, 2021, and \GQ\ on April~7, 2022.
+The observations of \UW\ were obtained opportunistically during a gap in the observing schedule of a single-epoch program targeting the NEA (3200)~Phaethon \citep[PI: Tomohiko Sekiguchi;][]{Beniyama2023a}.
+The observations of \TY\ and \GQ\ were carried out as part of a dual-epoch program focused on tiny NEAs (PI: Jin Beniyama), which is embedded within the Optical and Infrared Synergetic Telescopes for Education and Research (OISTER) collaboration.
+The OISTER network operates small ground-based telescopes in Japan and South Africa under an inter-university framework.
+
+The observing circumstances are summarized in Table~\ref{tab:obs}.
+%The predicted $V$-band magnitudes, solar phase angles, and apparant angular rate listed in Table~\ref{tab:obs} were obtained from the NASA JPL Horizons system\footnote{\url{https://ssd.jpl.nasa.gov/horizons}} using the Python package \texttt{astroquery} \citep{Ginsburg2019}.
+All observations were performed with the TriColor CMOS Camera and Spectrograph (TriCCS) mounted on the 3.8~m Seimei Telescope \citep{Kurita2020}, located at the Kyoto University Okayama Observatory (longitude 133.5967$^\circ$~E, latitude 34.5769$^\circ$~N, altitude 355~m).
+We simultaneously acquired images in three bands corresponding to the Pan-STARRS $g$, $r$, and $i$ filters \citep{Chambers2016}.
+The instrument provides a field of view of $12.6\arcmin\times7.5\arcmin$ with a pixel scale of 0.350~arcsec~pixel$^{-1}$.
+
+The apparent brightnesses and solar phase angles of the observed NEAs are shown in Fig.~\ref{fig:ephem}.
+Observations were carried out near the epochs of peak apparent brightness for the asteroids.
+All observations were carried out with nonsidereal tracking at the apparent motion rates of the targets.
+The exposure times were set to 5~s for \UW\ and 1~s for both \TY\ and \GQ\.
+Rather than using single long exposures, we obtained a sequence of short-exposure images.
+This strategy minimizes the elongation of background reference stars caused by nonsidereal tracking and enables us to resolve rapid lightcurve variations associated with the rotation of the NEAs.
+
+\subsection{Data reduction}
+We applied standard image reduction procedures, including bias subtraction, dark subtraction, and flat-field correction, to all frames.
+Astrometric solutions were derived using reference sources from the Gaia Data Release~2 catalog and the \texttt{astrometry.net} software package \citep{Lang2010}.
+A small fraction of the data was discarded owing to poor image quality, unstable observing conditions, 
+or cases in which the target overlapped with nearby sources, preventing reliable photometry.
+
+The colors and magnitudes of the NEAs were derived following the same procedures as those described in \citet{Beniyama2023a, Beniyama2023b, Beniyama2023c, Beniyama2024, Beniyama2025b, Beniyama2025c}, except for the photometry of \GQ, which required a different approach (see below).
+Cosmic rays were identified and removed using the Python package \texttt{astroscrappy} \citep{McCully2018}, which implements the L.A.Cosmic algorithm developed by \citet{vanDokkum2001}.
+
+Circular aperture photometry of the NEAs was performed using the SExtractor-based Python package \texttt{sep}.
+The aperture radii were set to \radTY~pix for \TY and \UW, corresponding to approximately 1.5 times the full width at half maximum (FWHM) of the point-spread functions (PSFs) of nearby reference stars.
+Photometry of the reference stars was also carried out using \texttt{sep}.
+%adopting circular apertures after global background subtraction.
+The same aperture radii as those used for the NEAs were applied to the reference stars.
+
+Photometric calibration was performed using the Pan-STARRS Data Release~2 catalog \citep{Chambers2016}.
+Reference stars were excluded from the analysis if they met any of the following criteria:
+catalog uncertainties in the $g$, $r$, $i$, or $z$ bands larger than 0.05~mag;
+$(g-r)_{\mathrm{PS}} > 1.1$;
+$(g-r)_{\mathrm{PS}} < 0.0$;
+$(r-i)_{\mathrm{PS}} > 0.8$;
+or $(r-i)_{\mathrm{PS}} < 0.0$,
+where $(g-r)_{\mathrm{PS}}$ and $(r-i)_{\mathrm{PS}}$ denote colors in the Pan-STARRS photometric system.
+In addition, photometric measurements obtained within 100~pixels of the image edges or affected by contamination from nearby sources within the aperture were rejected on a frame-by-frame basis.
+Extended sources, candidate quasars, and variable stars were removed using the \texttt{objinfoflag} and \texttt{objfilterflag} parameters in the Pan-STARRS catalog.
+%Typically, \RED{XXX reference stars} were used for calibration in each frame.
+%Frames containing fewer than \RED{five} suitable reference stars were excluded to avoid systematic uncertainties in the derived colors and magnitudes.
+%The typical uncertainties in the photometric zero points are smaller than \RED{0.01~mag}.
+
+% Lightcurve of GQ
+For \GQ, the observed field was sparsely populated, and almost no sufficiently bright reference stars were present in the 1~s exposure images.
+As a result, we adopted a different analysis strategy.
+The signal-to-noise ratio (S/N) of \GQ\ in individual 1~s images is typically a few to less than ten in the $g$ band.
+While this S/N is sufficient to detect lightcurve variations with amplitudes exceeding this level, no reference stars with adequate S/N were available in the field.
+Therefore, we derived a relative instrumental lightcurve under the assumption that sky conditions remained stable over an interval of approximately 80~s, enabling us to examine rotational brightness variations.
+We tested several aperture radii and adopted \radGQ~pix as the nominal value; the resulting lightcurve properties are insensitive to this choice.
+
+% Color of GQ
+To determine colors for \GQ, image stacking was required to increase the S/N of the reference stars.
+We stacked 20 successive images with individual exposure times of 1~s, resulting in images with effective exposure times of 20~s.
+The typical readout time of the TriCCS CMOS detectors is approximately 0.4~ms, which is negligible compared to the total exposure time.
+Stacking was performed using the World Coordinate System (WCS) solutions derived from surrounding field sources to minimize elongation of 
+\GQ; these are hereafter referred to as nonsidereally stacked images.
+Stacking was also performed to minimize elongationsof reference star images; 
+these are hereafter referred to as sidereally stacked images.
+Photometry of \GQ was obtained from the nonsidereally stacked images, while photometry of the reference stars was measured from the sidereally stacked images.
+Two reference stars were used to account for color terms in the calibration.
+The last one frame was excluded from the analysis because the two reference stars were located outside the field of view.
+
+
+\input{tab_phot}
+\begin{figure*}
+\centering
+\begin{minipage}[b]{0.32\hsize}
+    \centering
+    \includegraphics[width=\hsize]{2021TY14_ephem.pdf}
+    %\subcaption{\TY}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.32\hsize}
+    \centering
+    \includegraphics[width=\hsize]{2021UW1_ephem.pdf}
+    %\subcaption{\UW}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.32\hsize}
+    \centering
+    \includegraphics[width=\hsize]{2022GQ1_ephem.pdf}
+    %\subcaption{\QG}
+\end{minipage}
+\caption{
+Ephemerides of \TY, \UW, and \GQ.
+Apparent brightnesses and phase angles are shown by solid and dashed lines, respectively.
+The times of our observations are indicated by vertical dotted lines.
+Photometric data from the MPC database with
+reported magnitude uncertainties are shown as circles with the error bars.
+For illustrative purposes, 
+all available photometric data are plotted regardless of the calibrated band.
+}
+\label{fig:ephem}
+\end{figure*}
+
+
+\section{Results and discussion} \label{sec:result}
+\subsection{Rotation periods and axial ratios} \label{subsec:res_lc}
+The lightcurves of the NEAs are shown in Fig. \ref{fig:lc_full_TY}--\ref{fig:lc_full_GQ}. 
+We see clear lightcurve variations.
+We performed a periodic analysis using the lightcurves with the highest signal-to-noise ratio: the $r$-band lightcurves for \TY\ and \UW, and the $i$-band lightcurve for \GQ, applying the Lomb--Scargle technique \citep{Lomb1976, Scargle1982, VanderPlas2018}.
+The results of periodic analyses are shown in Fig. \ref{fig:LS_TY}--\ref{fig:LS_MC_GQ}.
+The derived rotation periods and lightcurve amplitudes are summarized in Table \ref{tab:res}.
+Assuming the double-peak lightcurves,
+we found the rotation periods of 
+\rotPofTY for \TY,  \rotPofUW for \UW, and \rotPofGQ for \GQ.
+The phased lightcurves are shown in Fig. \ref{fig:plc}.
+Three asteroids are all sub-minute rotators with rotation periods less than 60~s.
+
+% Mention previous observations
+% 2021 UW1: Birtwhistle2022a
+% 2021 TY14: Beniyama2022
+% 2022 GQ1: No previous studies
+\citet{Birtwhistle2022a} reported observations of \UW on October 30, 2021 when \UW was as bright as 16~mag in $V$ band and 
+its solar phase angle was as large as 90~deg (see Fig. \ref{fig:ephem}).
+They obtained 43~minutes of lightcurves with 0.9~s exposure.
+% Another solution $0.0029308\pm0.0000003$~hr
+The rotation period with the strongest peak of the period spectrum was estimated to be 
+$0.0058620\pm0.0000004$~hr, or $21.1032\pm0.0014$~s.
+Their lightcurve amplitude was estimated to be as large as 1.2 mag.
+Our rotation period is consistent with the solution in \citet{Birtwhistle2022a}.
+Our smaller lightcurve amplitude is interpreted as a results of 
+long exposure compared to the rotation period, 5~s, 
+as well as the smaller solar phase angle of about 24~deg.
+\citet{Beniyama2022} performed video observations of \TY using 
+CMOS camera Tomo-e Gozen on October 15, 2021,
+approximately three hours before our observations.
+The rotation period was reported to be $15.292\pm0.002$~s,
+and lightcurve amplitude was estimated to be $0.61\pm0.02$.
+Our results are broadly consistent with them. 
+% Period and dm are both different
+% P=15.292+-0.002 vs. 15.282+-0.001
+% dm=0.61+-0.02 vs. 0.768+-0.012
+These consistencies indicate that our measurements are reliable.
+
+We assumed the asteroid is a triaxial ellipsoid with
+axial lengths of $a$, $b$, and $c$ ($a \geq b \geq c$) and the aspect angle, angle between rotation axis and the asteroids--observer direction, of 90~deg. 
+A lower limit on the axial ratio $a/b$ is given by:
+\begin{equation}
+(a/b)_\mathrm{min} = 10^{0.4 m(\alpha)/(1+m\alpha)},
+\end{equation}
+where $m(\alpha)$ is the lightcurve amplitude at a phase angle of $\alpha$ 
+and $m$ is a ratio of a slope of amplitude-phase relationship to $m(0)$, 
+which is known to depend on the taxonomic type of the asteroid \citep{Bowell1989}.
+When we assume $m$ of 0.030, a typical value of S-type asteroids \citep{Zappala1990}, 
+which is known to be a maximum slope \citep{Gutierrez2006},
+we find that the axial ratios satisfy 
+$a/b >$ \abminTY for \TY,
+$a/b >$ \abminUW for \UW,
+and 
+$a/b >$ \abminGQ for \GQ.
+As discussed above, for \UW, the smearing effect likely resulted in an underestimated amplitude. Thus, its axial ratio should be regarded as a conservative lower limit.
+These axial ratios of tiny sub-minute rotators are consistent with the trend reported in previous studies investigating the correlation between diameter, rotation period, and axial ratio \citep{Hatch2015, Thirouin2016, Beniyama2022}.
+% This is not True for NEAs at the large phase angle of about 80 deg?
+
+\subsection{Surface colors}
+The derived colors of the NEAs are summarized in Table~\ref{tab:res}.
+For comparison, the derived colors are plotted in Fig.~\ref{fig:cc} together with those of asteroids drawn from a recent color catalog \citep{Sergeyev2021}.
+In that catalog, each asteroid is assigned probabilities of belonging to different taxonomic complexes.
+We selected asteroids with probabilities of 80\% or higher for a given complex, excluding the U class, which denotes objects of unknown taxonomy.
+We computed the $g-r$ and $r-i$ colors in the SDSS system and subsequently transformed them into the Pan-STARRS system using the conversion equations provided by \citet{Tonry2012}.
+By a visual inspection of the color--color diagrams, \UW\ and \GQ\ overlap with 
+the region of S-complex asteroids, 
+whereas \TY\ is consistent with the region occupied by X-complex asteroids.
+
+% Homogeneity
+Color lightcurves can be used to investigate their surface homogeneity \citep[e.g.,][]{Degewij1979}.
+Simultaneous photometry is a powerful technique for investigating surface homogeneity, as it reduces the effects of atmospheric variations on the measurements \citep[e.g.,][]{Beniyama2023a}.
+To investigate possible surface heterogeneity of the observed NEAs, 
+we constructed rotational color lightcurves as shown in Figs.~\ref{fig:col_TY}--\ref{fig:col_GQ}.
+For each target, the data were folded using the derived rotation period and divided into 10 equal phase bins.
+Within each bin, we computed the weighted mean color and its uncertainty.
+%assuming independent errors are following normal distributions.
+We define the maximum color difference, $\Delta C$, as the difference between the maximum and minimum binned colors, $\Delta C = |C_{\rm max} - C_{\rm min}|$.
+The resulting values are as follows:
+$\Delta C_{g-r} = $\dCgrTY and $\Delta C_{r-i} =$ \dCriTY  for \TY,
+$\Delta C_{g-r} = $\dCgrUW and $\Delta C_{r-i} =$ \dCriUW  for \UW,
+and
+$\Delta C_{g-r} = $\dCgrGQ  and $\Delta C_{r-i} =$ \dCriGQ  for \GQ.
+
+% Previous studies
+%   Beniyama+2023, Phaethon g-r < 0.018, r-i < 0.020
+%   Tabeshian+2019, Phaethon 
+%   Szabo+2004, SDSS many asteroids 0.06–0.11 mag (rms)
+%               (not rotation variation, almost simultaneous)
+%               Compared them with NEAR and HST in
+%               5 Discussion and conclusions
+%   Lacerda+2008, Haumea, B-R ~ 0.04 mag (peak-to-valley)
+%                 qualitative estimate
+%   Degewij1979, MBAs, 6 MBAs > 0.03 visible colors
+Various ranges of color differences have been reported in the literature:
+0.06--0.11 mag for asteroids in the Sloan Digital Sky Survey Moving Object Catalog \citep{Szabo2004},
+$\sim0.04$~mag for a TNO (136108)~2003 EL$_{61}$ \citep[Haumea,][]{Lacerda2008},
+and $\sim0.02$~mag for an NEA (3200)~Phaethon \citep{Beniyama2023a}.
+The observed color variations for each of the three NEAs suggest possible surface heterogeneity.
+
+To quantitatively estimate the fraction of the possible surface heterogeneity, 
+we assume a simple two-component model consisting of a "main" surface and a "spot" with a different color. 
+Let $C_{\rm main}$ and $C_{\rm spot}$ denote the intrinsic colors of 
+the main body and the anomalous patch, respectively. 
+Under the assumption of linear mixing, 
+the observed color at a given rotation phase, $C_{\rm obs}$, is determined by the projected area ratio of the spot, $f_{\rm spot}$, as follows:
+\begin{equation}
+    C_{\rm obs}(f_{\rm spot}) = (1 - f_{\rm spot}) C_{\rm main} + f_{\rm spot} C_{\rm spot}
+\end{equation}
+The maximum color variation observed in the rotational color lightcurve, $\Delta C_{\rm lc}$, corresponds to the difference between the phase where the spot has the maximum visibility and the phase where the surface is dominated by the main component and the spot is invisible. 
+Thus, $\Delta C_{\rm lc}$ is expressed as:
+\begin{equation}
+    \Delta C_{\rm lc} = |   C_{\rm obs}(f_{\rm spot, max}) -    C_{\rm obs}(0)| = f_{\rm spot, max} |C_{\rm main} - C_{\rm spot}|,
+\end{equation}
+where $f_{\rm spot, max}$ is the maximum projected area ratio of the spot.
+Rearranging this for $f_{\rm spot, max}$, we obtain:
+\begin{equation}
+    f_{\rm spot, max} = \frac{\Delta C_{\rm lc}}{|C_{\rm main} - C_{\rm spot}|}
+\end{equation}
+It should be noted that $f_{\rm spot}$ represents the ratio of the projected area of the spot relative to the total projected area of the asteroid at the observed geometry, rather than its true physical surface area. 
+Conversion to the actual surface area would require further modeling of the asteroid's three-dimensional shape.
+
+As shown in Fig.~\ref{fig:col_GQ}, the signal-to-noise ratios of the colors of \GQ\ are low, and we could not obtain meaningful constraints.
+For \UW\ and \TY, we consider the most notable cases.
+Using the maximum color differences and assuming that the spot is either 0.2~mag redder or bluer, which is consistent with the range of colors for various asteroid types shown in Fig.~\ref{fig:cc}, we estimate the upper limits on the spot fraction.
+For each object, we adopt the strongest constraint from either $g-r$ or $r-i$. 
+In this study, the strongest constraints are in fact derived from $r-i$ for both objects.
+The resulting upper limits are $f_{\rm spot, max} = \fspotmaxTY$ for \TY and $f_{\rm spot, max} = \fspotmaxUW$ for \UW.
+The resulting upper limits indicate that the surfaces of \TY\ and \UW\ are largely homogeneous, 
+although minor heterogeneity up to $\sim20$~\% in fractional area cannot be excluded.
+
+Recently, \citet{Hasegawa2024} investigated candidates for surface heterogeneity in a sample of 130 main-belt asteroids using multiepoch visible-to-near-infrared spectroscopic data from the MIT–Hawaii Near-Earth Object Spectroscopic Survey using 
+the NASA IRTF.
+They extended the diameter range of candidates for surface heterogeneity from the conventional 100~km down to as small as 5~km.
+This study provided the first evidence of surface heterogeneity in tiny asteroids smaller than 100~m, suggesting that many tiny NEAs may be similar to 2008~TC$_3$, which was recovered as the Almahata Sitta meteorite and found to be a mixture of different meteorite types \citep{Jenniskens2009, Jenniskens2010}.
+Simultaneous multicolor photometry of fast-rotating asteroids has been demonstrated to be an effective method for probing surface heterogeneity. 
+Ongoing and future space missions targeting small asteroids, such as the Hayabusa2 extended mission \citep{Hirabayashi2021, Kikuchi2023} for 1998~KY$_{26}$ and the Tianwen-2 mission \citep{Zhang2021} for (469219)~Kamo`oalewa, will provide comparative information on their surface homogeneity.
+%Chinese Near-Earth Asteroid Defense Mission for 2015 XF$_{261}$
+
+\subsection{Diameter-period relation with spectral types} \label{subsec:DP}
+% 1. Previous studies
+The diameter--rotation period diagram (Fig. \ref{fig:DP}) could tell us the dynamical history of small bodies \citep[e.g.,][]{Holsapple2007, Kwiatkowski2010c, Sanchez2014, Thirouin2016, Thirouin2018, Beniyama2022}.
+For larger bodies (typically $D \geq 200$~m), 
+it has been established that they are constrained by the cohesionless spin barrier, 
+and a dependence on spectral type has been reported and discussed \citep[][]{Perna2016, Carbognani2017, Rondon2020}.
+In contrast, smaller objects can rotate faster than the cohesionless spin barrier and are expected to deviate from this limit due to material strength. 
+However, observational constraints remain limited.
+
+% 2. First discovery to our knowledge
+We estimated both the spectral types and rotation periods of three sub-minute rotators through multicolor video observations, as shown in panel (b) of Fig.~\ref{fig:DP}.
+The identification of spectrally classified objects in this extreme rotational regime provides valuable constraints on the internal structure and material strength of small asteroids \citep{Holsapple2004, Holsapple2007}.
+%In particular, S-type asteroids may possess higher material strength, potentially allowing them to sustain faster rotation rates \citep{Holsapple2007}.
+A detailed statistical analysis of spectral-type trends in the diameter–period diagram is beyond the scope of this paper.
+%\RED{(Explain all data. LCDB \citep{Warner2009}. Mention U parameter. Probably in the Appendix)}
+
+
+% Fiture prospects
+As \citet{Greenstreet2026} demonstrated, many fast-rotating asteroids are expected to be discovered by the Rubin Observatory over the next decade.
+However, even with Rubin, detecting sub-minute rotators whose rotation periods are comparable to typical exposure times will be challenging, although such objects may still be detectable through streak photometry \citep[e.g,][]{Bolin2024, Devogele2024b}.
+Therefore, video observations like those presented in this study will be crucial for the physical characterization of fast-rotating asteroids.
+
+\input{tab_res}
+
+\begin{figure*}
+\centering
+\includegraphics[width=1.0\hsize]{2021TY14_lc_full.pdf}
+\caption{
+Lightcurves of \TY. 
+Bars indicate the 1$\sigma$ uncertainties. 
+}
+\label{fig:lc_full_TY}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\includegraphics[width=1.0\hsize]{2021UW1_lc_full.pdf}
+\caption{
+Lightcurves of \UW. 
+Bars indicate the 1$\sigma$ uncertainties. 
+}
+\label{fig:lc_full_UW}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\includegraphics[width=1.0\hsize]{2022GQ1_lc_full.pdf}
+\caption{
+Lightcurves of \GQ. 
+Bars indicate the 1$\sigma$ uncertainties. 
+}
+\label{fig:lc_full_GQ}
+\end{figure*}
+
+
+\begin{figure*}
+\centering
+\begin{minipage}[b]{0.32\hsize}
+    \centering
+    \includegraphics[width=\hsize]{2021TY14_plc.pdf}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.32\hsize}
+    \centering
+    \includegraphics[width=\hsize]{2021UW1_plc.pdf}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.32\hsize}
+    \centering
+    \includegraphics[width=\hsize]{2022GQ1_plc.pdf}
+\end{minipage}
+\caption{
+Phased lightcurves of \TY, \UW, and \GQ.
+From top to bottom, the $g$, $r$, and $i$ lightcurves are shown, folded by the derived rotation periods.
+Phase zero is set to 
+JD 2459503.0 (2021 October 15 12:00:00 UT) for \TY,
+JD 2459504.5 (2021 October 29 12:00:00 UT) for \UW, 
+and
+JD 2459505.2 (2022 April 07 12:00:00 UT) for \GQ.
+The $g$ and $i$ lightcurves are vertically offset by $-1$ and $+1$~mag, respectively.
+Bars indicate the 1$\sigma$ uncertainties.
+}
+\label{fig:plc}
+\end{figure*}
+
+
+\begin{figure}
+\centering
+\includegraphics[width=1.0\hsize]{cc_PS.pdf}
+\caption{
+Color-color diagram of $g$-$r$ vs. $r$-$i$.
+The weighted mean colors of the NEAs, derived from individual nightly measurements, are plotted as stars.
+The error bars represent the uncertainties of the weighted means.
+Asteroids from \citep{Sergeyev2021} are also plotted: 
+S-complex (circles), 
+V-complex (triangles),
+X-complex (squares),
+K-complex (diamonds),
+L-complex (inverse triangles),
+C-complex (left-pointing triangles),
+B-complex (right-pointing triangles),
+D-complex (pentagons),
+and 
+A-complex (hexagons). 
+}
+\label{fig:cc}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=1.0\hsize]{2021TY14_colorlc.pdf}
+\caption{
+Color lightcurves of \TY. 
+From top to bottom, the g-r and r-i color lightcurves are presented. 
+The color lightcurves are folded by the derived period. 
+Phase zero is set to JD 2459503.0 
+(2021 October 15 12:00:00 UT). 
+The $g-r$ and $r-i$ color lightcurves are normalized such that their median values equal 1. 
+The $r-i$ color lightcurve has been shifted to 
+center around 0.5, and the curves are horizontally offset by 0.5 mag for the sake of clarity. 
+Bars indicate the 1$\sigma$ uncertainties.
+
+}
+\label{fig:col_TY}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=1.0\hsize]{2021UW1_colorlc.pdf}
+\caption{
+Same as Fig. \ref{fig:col_TY}, but for \UW.
+}
+\label{fig:col_UW}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=1.0\hsize]{2022GQ1_colorlc.pdf}
+\caption{
+Same as Fig. \ref{fig:col_TY}, but for \GQ.
+}
+\label{fig:col_GQ}
+\end{figure}
+
+\begin{figure*}
+\centering
+\includegraphics[width=1.0\hsize]{DP.pdf}
+\caption{
+(a) Diameter–rotation period relations for objects in the LCDB \citep{Warner2009} as of October 2023 are shown as plus signs.
+The three NEAs observed in this work are shown as a pentagon (\UW), a hexagon (\GQ), and an octagon (\TY).
+(b) Diameter–rotation period relations for objects with spectral-type estimates in the literature (see the main text for details).
+S-complex, C-complex, X-complex, and other types are shown with circles, squares, diamonds, and crosses, respectively.
+The region including small, fast-rotating asteroids is indicated by a dashed outline.
+}
+\label{fig:DP}
+\end{figure*}
+
+%\begin{figure*}
+%\centering
+%\begin{minipage}[b]{0.32\hsize}
+%    \centering
+%    \includegraphics[width=\hsize]{2021TY14_pc.pdf}
+%    %\subcaption{\TY}
+%\end{minipage}
+%\hfill
+%\begin{minipage}[b]{0.32\hsize}
+%    \centering
+%    \includegraphics[width=\hsize]{2021UW1_pc.pdf}
+%    %\subcaption{\UW}
+%\end{minipage}
+%\hfill
+%\begin{minipage}[b]{0.32\hsize}
+%    \centering
+%    \includegraphics[width=\hsize]{2022GQ1_pc.pdf}
+%    %\subcaption{\QG}
+%\end{minipage}
+%\caption{
+%Phase curves of \TY, \UW, and \GQ.
+%}
+%\label{fig:pc}
+%\end{figure*}
+
+
+\section{Conclusion}
+We conducted simultaneous tricolor video observations of three tiny near-Earth asteroids, \TY, \UW, and \GQ.
+We derived their rotation periods and visible colors, confirming that all three are ultra-fast-rotating asteroids with rotation periods shorter than 60~s.
+The derived colors indicate that \UW\ and \GQ\ are consistent with S-complex asteroids, while \TY\ is consistent with the X-complex.
+Analysis of the color variations over their rotation allowed us to place constraints on surface heterogeneity, suggesting that the surfaces of these asteroids are relatively homogeneous, although small regions with compositional differences of up to around 
+20\% may still be present.
+Although many fast-rotating asteroids are expected to be discovered by the Rubin Observatory in the next decade, detecting fast rotators with periods comparable to typical exposure times will remain challenging.
+High-cadence, multicolor observations with small to medium ground-based telescopes will therefore remain essential for characterizing these tiny objects and improving our understanding of their rotation states and surface properties.
+%Combining our results with literature data, we examined the diameter–rotation period relation for small, fast-rotating asteroids.
+%Our analysis shows that, within the current sample, the size–rotation relationship does not exhibit a statistically significant dependence on spectral type.
+
+
+\begin{acknowledgements}
+% Referee (TBD)
+% Funding (JP22K21344: kokusaisendo, JP23KJ0640: DC2, 25H00665: kibanA)
+This work was supported by JSPS KAKENHI Grant Numbers JP22K21344, JP23KJ0640, and 25H00665.
+This work was supported by the French government through the France 2030
+investment plan managed by the National Research Agency (ANR), as part of the
+Initiative of Excellence Université Côte d’Azur under reference number ANR-15-IDEX-01.
+This work was supported by the Japan Society for the Promotion of Science (JSPS) Overseas Research Fellowships.
+% OISTER
+This research is partially supported by the Optical
+and Infrared Synergetic Telescopes for Education and Research
+(OISTER) program funded by MEXT of Japan.
+% TriCCS 
+The authors thank the TriCCS developer team (which has been supported by the JSPS KAKENHI grant Nos. JP18H05223,
+JP20H00174, and JP20H04736, and by NAOJ Joint Development Research).
+% Pan-STARRS
+The Pan-STARRS1 Surveys (PS1) and the PS1 public science archive have been
+made possible through contributions by the Institute for Astronomy,
+the University of Hawaii, the Pan-STARRS Project Office,
+the Max-Planck Society and its participating institutes,
+the Max Planck Institute for Astronomy, Heidelberg and
+the Max Planck Institute for Extraterrestrial Physics, Garching,
+The Johns Hopkins University, Durham University, the University of Edinburgh,
+the Queen's University Belfast, the Harvard-Smithsonian Center for Astrophysics,
+the Las Cumbres Observatory Global Telescope Network Incorporated,
+the National Central University of Taiwan, the Space Telescope Science Institute,
+the National Aeronautics and Space Administration under Grant No. NNX08AR22G
+issued through the Planetary Science Division of the NASA Science Mission Directorate,
+the National Science Foundation Grant No. AST-1238877, the University of Maryland,
+Eotvos Lorand University (ELTE), the Los Alamos National Laboratory,
+and the Gordon and Betty Moore Foundation.
+\end{acknowledgements}
+
+
+% Use my own bib file
+\bibliographystyle{aa} 
+\bibliography{bib_JB.bib}
+
+\clearpage
+\begin{appendix} 
+
+
+\section{Periodic analysis}
+Lomb--Scargle periodograms of the three NEAs are presented in 
+Fig. \ref{fig:LS_TY}--\ref{fig:LS_MC_GQ}.
+We showed 90.0, 99.0, and 99.9\% confidence levels in the periodogram.
+The number of harmonics of the model curve was set to unity.
+The uncertainties of the rotation period and lightcurve amplitude were estimated using a Monte Carlo method, in which the number of harmonics in the model curves was set to two.
+For each NEA, we generated \Nmc synthetic lightcurves by randomly resampling the observed data, assuming that each data point follows a normal distribution with a standard deviation equal to its photometric error.
+We then calculated the period and amplitude for each of the \Nmc lightcurves using the corresponding peak frequencies.
+The standard deviations of these \Nmc measurements were adopted as the uncertainties of the period and amplitude.
+
+
+\begin{figure*}[htbp]
+\centering
+\begin{minipage}[t]{0.35\hsize}
+  \centering
+  \includegraphics[width=\hsize]{2021TY14_LS.pdf}
+  \caption{
+    Lomb--Scargle periodogram of \TY.
+    %The number of harmonics of the model curve is unity.
+    Horizontal dashed, dash-dotted, and dotted lines show 90.0, 99.0, and 99.9\% confidence levels, respectively.
+    }
+  \label{fig:LS_TY}
+\end{minipage}
+\hspace{0.02\hsize}
+\begin{minipage}[t]{0.35\hsize}
+  \centering
+  \includegraphics[width=\hsize]{2021TY14_LS_mc.pdf}
+  \caption{
+  Scatter plot of the rotation periods and the light curve amplitudes of \Nmc model curves of \TY. 
+  Histograms at the top and to the side present the marginal distributions of the periods and the amplitudes, respectively. 
+  The corresponding 1$\sigma$ standard deviations are calculated from the marginal histograms of the period and amplitude, respectively.
+  In the period–amplitude diagram, the dashed lines enclose the 1$\sigma$ confidence region in the period–amplitude space for the derived solutions.
+}
+  \label{fig:LS_MC_TY}
+\end{minipage}
+\end{figure*}
+
+\begin{figure*}[htbp]
+\centering
+\begin{minipage}[t]{0.35\hsize}
+  \centering
+  \includegraphics[width=\hsize]{2021UW1_LS.pdf}
+  \caption{
+  Same as Fig. \ref{fig:LS_TY}, but for \UW.
+  }
+  \label{fig:LS_UW}
+\end{minipage}
+\hspace{0.02\hsize}
+\begin{minipage}[t]{0.35\hsize}
+  \centering
+  \includegraphics[width=\hsize]{2021UW1_LS_mc.pdf}
+  \caption{
+    Same as Fig. \ref{fig:LS_MC_TY}, but for \UW.
+    }
+  \label{fig:LS_MC_UW}
+\end{minipage}
+\end{figure*}
+
+
+\begin{figure*}[htbp]
+\centering
+\begin{minipage}[t]{0.35\hsize}
+  \centering
+  \includegraphics[width=\hsize]{2022GQ1_LS.pdf}
+  \caption{
+  Same as Fig. \ref{fig:LS_TY}, but for \GQ.
+  }
+  \label{fig:LS_GQ}
+\end{minipage}
+\hspace{0.02\hsize}
+\begin{minipage}[t]{0.35\hsize}
+  \centering
+  \includegraphics[width=\hsize]{2022GQ1_LS_mc.pdf}
+  \caption{
+    Same as Fig. \ref{fig:LS_MC_TY}, but for \GQ.
+    }
+  \label{fig:LS_MC_GQ}
+\end{minipage}
+\end{figure*}
+
+\end{appendix}
+\end{document}
