@@ -17,7 +17,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from common import (
-    mymark, myls, plot_jbstyle, mycolor, Zappala1990, plot_lc, plot_plc, 
+    JD0_dict, mymark, myls, plot_jbstyle, mycolor, Zappala1990, plot_lc, plot_plc, 
     ls_period_search, ls_mc_plot, plot_lc_full
     )
 
@@ -82,6 +82,8 @@ if __name__ == "__main__":
             is_relative = False
             # Highest SNR for both 2021TY14 and 2021UW1
             key_mag, key_magerr = "rmag", "rmagerr"
+
+        JD0 = JD0_dict[obj]
 
         nterm_mc = 2
 
@@ -152,6 +154,7 @@ if __name__ == "__main__":
             bandcolor=bandcolor,
             bandmark=bandmark,
             objtex=objtex,
+            JD0=JD0
         )
         print()
 
